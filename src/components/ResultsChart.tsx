@@ -11,6 +11,8 @@ import {
 } from 'recharts';
 import type { SimulationResults, UserInputs } from '../types';
 import { formatCurrency } from '../simulation';
+import { InfoBlock } from './InfoBlock';
+import { InfoTooltip } from './InfoTooltip';
 
 interface Props {
   results: SimulationResults;
@@ -64,25 +66,56 @@ export function ResultsChart({ results, inputs }: Props) {
 
   return (
     <div className="space-y-8">
+      <InfoBlock title="Understanding Your Results">
+        <p className="mb-2">
+          The simulation ran 1,000 different scenarios with randomized market returns to show you a range of possible outcomes.
+          This helps you plan for uncertainty rather than relying on a single prediction.
+        </p>
+        <div className="mb-2">
+          <strong>What the percentiles mean:</strong>
+          <ul className="list-disc list-inside mt-1 ml-2">
+            <li><strong>P10 (Conservative):</strong> 90% of scenarios did better than this - your "bad luck" case</li>
+            <li><strong>P50 (Median):</strong> Half of scenarios did better, half did worse - the most realistic expectation</li>
+            <li><strong>P90 (Optimistic):</strong> Only 10% of scenarios did better - your "good luck" case</li>
+          </ul>
+        </div>
+        <p>
+          <strong>Tip:</strong> Plan based on P10 or P25 to be conservative. If your P10 scenario still meets your needs, 
+          you're in great shape! If not, consider increasing savings or adjusting retirement plans.
+        </p>
+      </InfoBlock>
+
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Summary Statistics</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-sm text-blue-600 font-medium">Final Wealth (Expected)</p>
+            <p className="text-sm text-blue-600 font-medium">
+              Final Wealth (Expected)
+              <InfoTooltip content="This assumes steady, average returns every year with no volatility. Real markets fluctuate, so use the Monte Carlo results for more realistic planning." />
+            </p>
             <p className="text-2xl font-bold text-blue-800">
               {formatCurrency(finalDeterministic.totalSavings)}
             </p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
-            <p className="text-sm text-green-600 font-medium">Monte Carlo Median (P50)</p>
+            <p className="text-sm text-green-600 font-medium">
+              Monte Carlo Median (P50)
+              <InfoTooltip content="The middle outcome - half of the 1,000 simulations ended with more than this, half with less. This is a realistic expectation." />
+            </p>
             <p className="text-2xl font-bold text-green-800">{formatCurrency(finalP50)}</p>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4">
-            <p className="text-sm text-yellow-600 font-medium">Conservative (P10)</p>
+            <p className="text-sm text-yellow-600 font-medium">
+              Conservative (P10)
+              <InfoTooltip content="90% of simulations did better than this. Use this for conservative planning - if this amount meets your needs, you're likely in good shape." />
+            </p>
             <p className="text-2xl font-bold text-yellow-800">{formatCurrency(finalP10)}</p>
           </div>
           <div className="bg-purple-50 rounded-lg p-4">
-            <p className="text-sm text-purple-600 font-medium">Optimistic (P90)</p>
+            <p className="text-sm text-purple-600 font-medium">
+              Optimistic (P90)
+              <InfoTooltip content="Only 10% of simulations did better than this. Don't plan on this - it requires consistently good market performance over many years." />
+            </p>
             <p className="text-2xl font-bold text-purple-800">{formatCurrency(finalP90)}</p>
           </div>
         </div>

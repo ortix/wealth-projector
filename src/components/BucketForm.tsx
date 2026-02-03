@@ -1,5 +1,6 @@
 import type { SavingsBucket } from '../types';
 import { BUCKET_PRESETS } from '../types';
+import { InfoTooltip } from './InfoTooltip';
 
 interface Props {
   bucket: SavingsBucket;
@@ -42,6 +43,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Bucket Type
+            <InfoTooltip content="Changing the type will update the default values for returns and volatility based on typical values for that account type." />
           </label>
           <select
             value={bucket.type}
@@ -58,6 +60,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Current Balance ($)
+            <InfoTooltip content="How much money is currently in this account. Check your latest statement or log into your account to find this." />
           </label>
           <input
             type="number"
@@ -70,6 +73,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Expected Annual Return (%)
+            <InfoTooltip content="The average yearly growth rate you expect. HYSA: 4-5%, Bonds: 3-5%, Stock market (S&P 500): historically ~7-10% after inflation. Past performance doesn't guarantee future results." />
           </label>
           <input
             type="number"
@@ -82,8 +86,8 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Return Volatility (%) 
-            <span className="text-gray-400 text-xs ml-1">(for Monte Carlo)</span>
+            Return Volatility (%)
+            <InfoTooltip content="How much returns fluctuate year-to-year. Higher = more unpredictable. HYSA: ~0.5% (stable), Bonds: ~5%, Stocks: ~15-20% (can swing wildly). This affects the spread between best and worst case scenarios." />
           </label>
           <input
             type="number"
@@ -98,6 +102,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Contribution Type
+              <InfoTooltip content="Fixed: You contribute the same dollar amount each month. Percentage: You contribute a percentage of your salary (useful if your income grows over time)." />
             </label>
             <select
               value={bucket.contributionType}
@@ -114,6 +119,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Monthly Contribution ($)
+              <InfoTooltip content="How much you add to this account each month. For 401(k), this is typically deducted from your paycheck before taxes." />
             </label>
             <input
               type="number"
@@ -126,6 +132,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Contribution (% of Salary)
+              <InfoTooltip content="The percentage of your annual salary you'll contribute to this account each year. Example: 10% of a $100,000 salary = $10,000/year contribution." />
             </label>
             <input
               type="number"
@@ -141,7 +148,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Max Annual Contribution ($)
-              <span className="text-gray-400 text-xs ml-1">(IRS limit)</span>
+              <InfoTooltip content="The IRS limits how much you can contribute to a 401(k) each year. For 2024, the limit is $23,000 (or $30,500 if you're 50+). This is your contribution only, not including employer match." />
             </label>
             <input
               type="number"
@@ -157,6 +164,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Employer Match (%)
+                <InfoTooltip content="Many employers will match a portion of your 401(k) contributions - this is free money! For example, 50% match means for every $1 you contribute, your employer adds $0.50." />
               </label>
               <input
                 type="number"
@@ -169,6 +177,7 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Match Limit (% of salary)
+                <InfoTooltip content="Employers typically only match up to a certain percentage of your salary. Example: 50% match up to 6% means if you contribute 6% of salary, employer adds 3%. Contributing more than 6% won't get additional matching." />
               </label>
               <input
                 type="number"
@@ -181,6 +190,13 @@ export function BucketForm({ bucket, onChange, onDelete }: Props) {
           </>
         )}
       </div>
+
+      {bucket.type === '401k' && (
+        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+          <strong>Tip:</strong> Always try to contribute at least enough to get the full employer match - 
+          it's essentially a 50-100% instant return on your money!
+        </div>
+      )}
     </div>
   );
 }
