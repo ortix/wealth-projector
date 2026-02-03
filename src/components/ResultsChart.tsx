@@ -46,6 +46,22 @@ export function ResultsChart({ results, inputs }: Props) {
   const currency = inputs.currency;
   const currencySymbol = CURRENCIES.find(c => c.code === currency)?.symbol || '$';
 
+  const retirementIndex = Math.max(0, Math.min(results.deterministic.length - 1, inputs.retirementAge - inputs.currentAge));
+  const retirementAge = inputs.retirementAge;
+  const retirementAnnualSpending = inputs.monthlyRetirementSpending * 12 * Math.pow(1 + inputs.retirementSpendingIncrease / 100, retirementIndex);
+  const retirementP50Balance = results.monteCarlo.percentiles.p50[retirementIndex];
+  const safeWithdrawalRate = retirementP50Balance > 0 ? (retirementAnnualSpending / retirementP50Balance) * 100 : null;
+
+  const readinessScore = (() => {
+    const sims = results.monteCarlo.simulations || [];
+    if (!sims.length) return null;
+    const success = sims.filter((sim) => sim.slice(retirementIndex).every((year) => year.totalSavings > 0)).length;
+    return Math.round((success / sims.length) * 100);
+  })();
+
+  const runOutIndex = results.monteCarlo.percentiles.p10.findIndex((value, idx) => idx >= retirementIndex && value <= 0);
+  const runOutAge = runOutIndex !== -1 ? inputs.currentAge + runOutIndex : null;
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -62,7 +78,6 @@ export function ResultsChart({ results, inputs }: Props) {
     return null;
   };
 
-  const retirementAge = inputs.retirementAge;
   const finalDeterministic = results.deterministic[results.deterministic.length - 1];
   const finalP50 = results.monteCarlo.percentiles.p50[results.monteCarlo.percentiles.p50.length - 1];
   const finalP10 = results.monteCarlo.percentiles.p10[results.monteCarlo.percentiles.p10.length - 1];
@@ -91,7 +106,7 @@ export function ResultsChart({ results, inputs }: Props) {
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Summary Statistics</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <div className="bg-blue-50 rounded-lg p-4">
             <p className="text-sm text-blue-600 font-medium">
               Final Wealth (Expected)
@@ -121,6 +136,33 @@ export function ResultsChart({ results, inputs }: Props) {
               <InfoTooltip content="Only 10% of simulations did better than this. Don't plan on this - it requires consistently good market performance over many years." />
             </p>
             <p className="text-2xl font-bold text-purple-800">{formatCurrency(finalP90, currency)}</p>
+          </div>
+          <div className="bg-emerald-50 rounded-lg p-4">
+            <p className="text-sm text-emerald-600 font-medium">
+              Retirement Readiness
+              <InfoTooltip content="Percentage of Monte Carlo scenarios where your portfolio never hits $0 after retirement within the projection window." />
+            </p>
+            <p className="text-2xl font-bold text-emerald-800">
+              {readinessScore !== null ? `${readinessScore}%` : 'N/A'}
+            </p>
+          </div>
+          <div className="bg-orange-50 rounded-lg p-4">
+            <p className="text-sm text-orange-600 font-medium">
+              Years Until Money Runs Out (P10)
+              <InfoTooltip content="Uses the conservative 10th percentile path. If it drops to or below $0, this shows the age it happens; otherwise you stay solvent in this percentile." />
+            </p>
+            <p className="text-2xl font-bold text-orange-800">
+              {runOutAge !== null ? `Age ${runOutAge}` : 'Stays solvent'}
+            </p>
+          </div>
+          <div className="bg-rose-50 rounded-lg p-4">
+            <p className="text-sm text-rose-600 font-medium">
+              Safe Withdrawal Rate
+              <InfoTooltip content="Annual retirement spending (inflation-adjusted to your retirement year) divided by the median (P50) portfolio at retirement. Lower is safer; ~4% is a common guideline." />
+            </p>
+            <p className="text-2xl font-bold text-rose-800">
+              {safeWithdrawalRate !== null ? `${safeWithdrawalRate.toFixed(1)}%` : 'N/A'}
+            </p>
           </div>
         </div>
       </div>
