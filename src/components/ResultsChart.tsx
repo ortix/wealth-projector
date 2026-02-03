@@ -10,6 +10,7 @@ import {
   Line,
 } from 'recharts';
 import type { SimulationResults, UserInputs } from '../types';
+import { CURRENCIES } from '../types';
 import { formatCurrency } from '../simulation';
 import { InfoBlock } from './InfoBlock';
 import { InfoTooltip } from './InfoTooltip';
@@ -42,6 +43,9 @@ export function ResultsChart({ results, inputs }: Props) {
 
   const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
 
+  const currency = inputs.currency;
+  const currencySymbol = CURRENCIES.find(c => c.code === currency)?.symbol || '$';
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -49,7 +53,7 @@ export function ResultsChart({ results, inputs }: Props) {
           <p className="font-semibold">Age: {label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value)}
+              {entry.name}: {formatCurrency(entry.value, currency)}
             </p>
           ))}
         </div>
@@ -94,7 +98,7 @@ export function ResultsChart({ results, inputs }: Props) {
               <InfoTooltip content="This assumes steady, average returns every year with no volatility. Real markets fluctuate, so use the Monte Carlo results for more realistic planning." />
             </p>
             <p className="text-2xl font-bold text-blue-800">
-              {formatCurrency(finalDeterministic.totalSavings)}
+              {formatCurrency(finalDeterministic.totalSavings, currency)}
             </p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
@@ -102,21 +106,21 @@ export function ResultsChart({ results, inputs }: Props) {
               Monte Carlo Median (P50)
               <InfoTooltip content="The middle outcome - half of the 1,000 simulations ended with more than this, half with less. This is a realistic expectation." />
             </p>
-            <p className="text-2xl font-bold text-green-800">{formatCurrency(finalP50)}</p>
+            <p className="text-2xl font-bold text-green-800">{formatCurrency(finalP50, currency)}</p>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4">
             <p className="text-sm text-yellow-600 font-medium">
               Conservative (P10)
               <InfoTooltip content="90% of simulations did better than this. Use this for conservative planning - if this amount meets your needs, you're likely in good shape." />
             </p>
-            <p className="text-2xl font-bold text-yellow-800">{formatCurrency(finalP10)}</p>
+            <p className="text-2xl font-bold text-yellow-800">{formatCurrency(finalP10, currency)}</p>
           </div>
           <div className="bg-purple-50 rounded-lg p-4">
             <p className="text-sm text-purple-600 font-medium">
               Optimistic (P90)
               <InfoTooltip content="Only 10% of simulations did better than this. Don't plan on this - it requires consistently good market performance over many years." />
             </p>
-            <p className="text-2xl font-bold text-purple-800">{formatCurrency(finalP90)}</p>
+            <p className="text-2xl font-bold text-purple-800">{formatCurrency(finalP90, currency)}</p>
           </div>
         </div>
       </div>
@@ -136,7 +140,7 @@ export function ResultsChart({ results, inputs }: Props) {
               label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
             />
             <YAxis
-              tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
+              tickFormatter={(value) => `${currencySymbol}${(value / 1000000).toFixed(1)}M`}
               label={{ value: 'Total Wealth', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -217,7 +221,7 @@ export function ResultsChart({ results, inputs }: Props) {
               label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
             />
             <YAxis
-              tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
+              tickFormatter={(value) => `${currencySymbol}${(value / 1000000).toFixed(1)}M`}
               label={{ value: 'Balance', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -285,28 +289,28 @@ export function ResultsChart({ results, inputs }: Props) {
                     )}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm">
-                    {formatCurrency(proj.salary)}
+                    {formatCurrency(proj.salary, currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm">
-                    {formatCurrency(proj.yearlyContributions)}
+                    {formatCurrency(proj.yearlyContributions, currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-red-600">
-                    {proj.yearlyWithdrawals > 0 ? `-${formatCurrency(proj.yearlyWithdrawals)}` : '-'}
+                    {proj.yearlyWithdrawals > 0 ? `-${formatCurrency(proj.yearlyWithdrawals, currency)}` : '-'}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm">
-                    {formatCurrency(proj.yearlyReturns)}
+                    {formatCurrency(proj.yearlyReturns, currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                    {formatCurrency(proj.totalSavings)}
+                    {formatCurrency(proj.totalSavings, currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-yellow-600">
-                    {formatCurrency(results.monteCarlo.percentiles.p10[index])}
+                    {formatCurrency(results.monteCarlo.percentiles.p10[index], currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-green-600">
-                    {formatCurrency(results.monteCarlo.percentiles.p50[index])}
+                    {formatCurrency(results.monteCarlo.percentiles.p50[index], currency)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-purple-600">
-                    {formatCurrency(results.monteCarlo.percentiles.p90[index])}
+                    {formatCurrency(results.monteCarlo.percentiles.p90[index], currency)}
                   </td>
                 </tr>
               ))}

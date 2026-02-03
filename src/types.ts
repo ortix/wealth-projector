@@ -13,6 +13,18 @@ export interface SavingsBucket {
   maxAnnualContribution?: number;
 }
 
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'AUD' | 'CHF';
+
+export const CURRENCIES: { code: CurrencyCode; name: string; symbol: string }[] = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'CA$' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
+];
+
 export interface UserInputs {
   currentAge: number;
   retirementAge: number;
@@ -21,6 +33,7 @@ export interface UserInputs {
   projectionYears: number;
   monthlyRetirementSpending: number;
   retirementSpendingIncrease: number;
+  currency: CurrencyCode;
   buckets: SavingsBucket[];
 }
 

@@ -16,6 +16,7 @@ const defaultInputs: UserInputs = {
   projectionYears: 40,
   monthlyRetirementSpending: 5000,
   retirementSpendingIncrease: 2.5,
+  currency: 'USD',
   buckets: [
     {
       id: uuidv4(),
